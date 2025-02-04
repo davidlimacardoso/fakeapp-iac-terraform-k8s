@@ -17,4 +17,15 @@ provider "helm" {
 
 provider "aws" {
   region = var.region
+
+  default_tags {
+    tags = {
+      Environment     = local.env
+      Service         = "eks"
+      HashiCorp-Learn = "aws-default-tags"
+      Terraform       = true
+      Purpose         = "Terraform Workshop"
+      Project         = "DevOps"
+    }
+  }
 }

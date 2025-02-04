@@ -13,7 +13,7 @@ on:
     types: [created]
 
 env:
-  ENV: ${{ github.ref == 'refs/heads/main' && 'prd' || github.ref == 'refs/heads/stage' && 'stg' || github.ref == 'refs/heads/developer' && 'dev'}}
+  ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || github.ref == 'refs/heads/stage' && 'stg' || github.ref == 'refs/heads/developer' && 'dev'}}
 
 jobs:
   

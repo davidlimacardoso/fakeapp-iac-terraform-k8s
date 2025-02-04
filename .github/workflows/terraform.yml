@@ -13,8 +13,8 @@ on:
     types: [created]
 
 env:
-  ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || github.ref == 'refs/heads/stage' && 'stg' || github.ref == 'refs/heads/developer' && 'dev'}}
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+  ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || github.ref == 'refs/heads/stage' && 'stg' || github.ref == 'refs/heads/developer' && 'dev'}}
 
 permissions:
   id-token: write
@@ -35,13 +35,13 @@ jobs:
 
     steps:
 
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Showing Branch Name end Enviroment
         run: | 
           echo "The branch name is ${{ env.BRANCH_NAME }}!"
           echo "The environment is ${{ env.ENV }}!"
-
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Authenticate in the AWS
         uses: aws-actions/configure-aws-credentials@v4

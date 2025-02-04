@@ -13,7 +13,7 @@ on:
     types: [created]
 
 env:
-  ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || github.ref == 'refs/heads/stage' && 'stg' || github.ref == 'refs/heads/developer' && 'dev'}}
+  ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' || 'unknown' }}
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 permissions:

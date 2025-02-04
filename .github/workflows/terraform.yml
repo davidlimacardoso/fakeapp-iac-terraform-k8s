@@ -14,6 +14,7 @@ on:
 
 env:
   ENV: ${{ github.ref == 'refs/heads/main' && 'prod' || github.ref == 'refs/heads/stage' && 'stg' || github.ref == 'refs/heads/developer' && 'dev'}}
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 permissions:
   id-token: write
@@ -33,14 +34,20 @@ jobs:
         working-directory: ./terraform
 
     steps:
+
+      - name: Showing Branch Name end Enviroment
+        run: | 
+          echo "The branch name is ${{ env.BRANCH_NAME }}!"
+          echo "The environment is ${{ env.ENV }}!"
+
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Authenticate in the AWS
         uses: aws-actions/configure-aws-credentials@v4
         with: 
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: "${{ secrets.AWS_ROLE }}"
+          aws-region: "${{ secrets.AWS_REGION }}"
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3

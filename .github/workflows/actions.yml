@@ -1,0 +1,20 @@
+name: Infraestructure Actions
+
+on:
+  pull_request:
+    types: [opened, synchronize, closed]
+  push:
+    branches:
+      - main
+    paths:
+      - terraform/**
+
+jobs:
+  EXEC_INFRACOST:
+    name: Infracost Checks
+    permissions:
+      contents: read
+      pull-requests: write  
+    uses: davidlimacardoso/github-actions/.github/workflows/infracost.yml@main
+    secrets:
+      INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}

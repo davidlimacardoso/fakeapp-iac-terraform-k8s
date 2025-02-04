@@ -18,6 +18,9 @@ env:
   AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/github-actions-iac-role
   AWS_REGION: ${{ secrets.AWS_REGION }}
 
+permissions:
+  id-token: write
+
 jobs:
   
   plan:
@@ -25,7 +28,7 @@ jobs:
     permissions:
       pull-requests: write
       contents: read
-      id-token: write
+
     defaults:
       run:
         shell: bash
@@ -110,7 +113,6 @@ jobs:
       pull-requests: write
       issues: write  
       contents: write
-      id-token: write
       
     defaults:
       run:

@@ -1,0 +1,111 @@
+
+data "aws_iam_openid_connect_provider" "github_actions_oidc" {
+  arn = "arn:aws:iam::893777461466:oidc-provider/token.actions.githubusercontent.com"
+}
+
+##################################
+### GitHub Actions IaC Role ###
+##################################
+resource "aws_iam_role" "github_actions_iac_role" {
+  name = "github-actions-iac-${local.env}-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Federated = data.aws_iam_openid_connect_provider.github_actions_oidc.arn
+        }
+        Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:davidlimacardoso/fakeapp-iac-terraform-k8s:ref:refs/heads/main",
+              "repo:davidlimacardoso/fakeapp-iac-terraform-k8s:ref:refs/heads/stage",
+              "repo:davidlimacardoso/fakeapp-iac-terraform-k8s:ref:refs/heads/developer"
+            ]
+          }
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "github_actions_iac_policy" {
+  name = "github-actions-iac-${local.env}-policy"
+  role = aws_iam_role.github_actions_iac_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "*"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# resource "aws_iam_role_policy_attachment" "github_actions_iac_policy_attachment" {
+#   role       = aws_iam_role.github_actions_iac_role.name
+#   policy_arn = aws_iam_role_policy.github_actions_iac_policy.arn
+# }
+##################################
+### GitHub Actions Deploy Role ###
+##################################
+resource "aws_iam_role" "github_actions_deploy_role" {
+  name = "github-actions-deploy-${local.env}-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Federated = data.aws_iam_openid_connect_provider.github_actions_oidc.arn
+        }
+        Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:davidlimacardoso/demo-fakeapp-api:ref:refs/heads/main",
+              "repo:davidlimacardoso/demo-fakeapp-api:ref:refs/heads/stage",
+              "repo:davidlimacardoso/demo-fakeapp-api:ref:refs/heads/developer"
+            ]
+          }
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "github_actions_deploy_policy" {
+  name = "github-actions-deploy-${local.env}-policy"
+  role = aws_iam_role.github_actions_deploy_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "cloudformation:*"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# resource "aws_iam_role_policy_attachment" "github_actions_deploy_policy_attachment" {
+#   role       = aws_iam_role.github_actions_deploy_role.name
+#   policy_arn = aws_iam_role_policy.github_actions_deploy_policy.arn
+# }

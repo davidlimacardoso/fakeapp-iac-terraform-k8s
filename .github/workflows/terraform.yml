@@ -106,7 +106,6 @@ jobs:
 
             const output = #### Terraform Workspace 🤖\`${{ steps.workspace.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            #### Terraform Environment 👨‍💻\`${process.env.ENV}\`
             <details><summary>Show Plan 🔎</summary>
   
             \`\`\`diff

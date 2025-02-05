@@ -90,10 +90,22 @@ jobs:
             const fs = require('fs');
             let planOutput = fs.readFileSync('./terraform/plan_output.txt', 'utf8');
 
-            planOutput = planOutput
-              .replace(/^(\s*\+)/gm, '+')
-              .replace(/^(\s*\-)/gm, '-')
-              .replace(/^(\s*\~)/gm, '!');
+            const lines = planOutput.split('\n');
+            const modifiedLines = lines.map(line => {
+                // Analize if line start with this signals: '+', '-' ou '~'
+                const trimmedLine = line.trim();
+                if (trimmedLine.startsWith('+') || trimmedLine.startsWith('-') || trimmedLine.startsWith('~')) {
+                    // Capture the sihnal
+                    const sign = trimmedLine[0];
+                    // Remove the sign and the first space, then add the corresponding sign at the beginning
+                    let newLine = line.replace(/^[+\-~]\s*/, ' ').replace(/^ /, sign === '~' ? '! ' : sign + ' ');
+                    return newLine;
+                }
+                return line;
+            });
+
+            // Merge modified lines into a single string
+            planOutput = modifiedLines.join('\n');
 
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization 🤖\`${{ steps.init.outcome }}\`

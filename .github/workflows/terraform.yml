@@ -21,12 +21,14 @@ permissions:
   id-token: write
   contents: read
 
+
 jobs:
   
   plan:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      contents: read
 
     defaults:
       run:
@@ -44,6 +46,13 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Debug Environment Variables
+        run: |
+          echo "AWS_ROLE is ${{ env.AWS_ROLE }}"
+          echo "AWS_REGION is ${{ env.AWS_REGION }}"
+          echo "ENV is ${{ env.ENV }}"
+          echo "BRANCH_NAME is ${{ env.BRANCH_NAME }}"
 
       - name: Authenticate in the AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -114,6 +123,7 @@ jobs:
       pull-requests: write
       issues: write  
       contents: write
+      id-token: write
       
     defaults:
       run:

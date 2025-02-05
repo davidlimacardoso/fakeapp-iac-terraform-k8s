@@ -1,4 +1,10 @@
 
+# resource "aws_iam_openid_connect_provider" "github_actions" {
+#   url             = "https://token.actions.githubusercontent.com"
+#   client_id_list  = ["sts.amazonaws.com"]
+#   thumbprint_list = ["XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"]
+# }
+
 data "aws_iam_openid_connect_provider" "github_actions_oidc" {
   arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
 }
@@ -7,7 +13,7 @@ data "aws_iam_openid_connect_provider" "github_actions_oidc" {
 ### GitHub Actions IaC Role ###
 ##################################
 resource "aws_iam_role" "github_actions_iac_role" {
-  name = "github-actions-iac-${local.env}-role"
+  name = "github-actions-iac-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -35,7 +41,7 @@ resource "aws_iam_role" "github_actions_iac_role" {
 }
 
 resource "aws_iam_role_policy" "github_actions_iac_policy" {
-  name = "github-actions-iac-${local.env}-policy"
+  name = "github-actions-iac-policy"
   role = aws_iam_role.github_actions_iac_role.id
 
   policy = jsonencode({
@@ -60,7 +66,7 @@ resource "aws_iam_role_policy" "github_actions_iac_policy" {
 ### GitHub Actions Deploy Role ###
 ##################################
 resource "aws_iam_role" "github_actions_deploy_role" {
-  name = "github-actions-deploy-${local.env}-role"
+  name = "github-actions-deploy-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -88,7 +94,7 @@ resource "aws_iam_role" "github_actions_deploy_role" {
 }
 
 resource "aws_iam_role_policy" "github_actions_deploy_policy" {
-  name = "github-actions-deploy-${local.env}-policy"
+  name = "github-actions-deploy-policy"
   role = aws_iam_role.github_actions_deploy_role.id
 
   policy = jsonencode({

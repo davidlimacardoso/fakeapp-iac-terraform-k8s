@@ -107,10 +107,7 @@ jobs:
             // Merge modified lines into a single string
             planOutput = modifiedLines.join('\n');
 
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization 🤖\`${{ steps.init.outcome }}\`
-            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-            #### Terraform Workspace 🤖\`${{ steps.workspace.outcome }}\`
+            #### Terraform Workspace \`${{ env.ENV }}\`  🤖\`${{ steps.workspace.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
             <details><summary>Show Plan</summary>
   

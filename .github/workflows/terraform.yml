@@ -76,13 +76,6 @@ jobs:
         run: terraform plan -no-color -input=false -var-file=${{ env.ENV }}.tfvars -out=.planfile
         continue-on-error: true
 
-      - name: Check Planfile
-        run: |
-          if [ ! -f "planfile" ]; then
-            echo "Planfile not found!"
-            exit 1
-          fi
-
       - name: Hide Previous Comments
         uses: kanga333/comment-hider@master
         with:
@@ -155,7 +148,7 @@ jobs:
 
       - name: Terraform Apply
         id: apply
-        run: terraform apply -var-file=${{ env.ENV }}.tfvars -input=false -parallelism=1 planfile
+        run: terraform apply -var-file=${{ env.ENV }}.tfvars -input=false -parallelism=1 .planfile
         continue-on-error: true
 
       - name: Comment Apply Output

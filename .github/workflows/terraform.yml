@@ -16,17 +16,13 @@ env:
   AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.AWS_ROLE }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
 
-permissions:
-  id-token: write
-  contents: read
-
-
 jobs:
   
   plan:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      id-token: write
       contents: read
 
     defaults:

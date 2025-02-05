@@ -6,14 +6,15 @@ on:
       - stage
       - develop
 
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+
 jobs:
  
   CD:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-      actions: read
       
     steps:
       - name: Obter o código do projeto

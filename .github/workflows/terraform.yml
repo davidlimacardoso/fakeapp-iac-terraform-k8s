@@ -57,7 +57,11 @@ jobs:
 
       #- name: Terraform Refresh
       #  run: rm -rf .terraform
-
+      - name: Terraform Workspace
+        id: workspace
+        run: |
+          terraform workspace select ${{ env.ENV }} || terraform workspace new ${{ env.ENV }}
+          
       - name: Terraform Init
         id: init
         run: terraform init
@@ -69,11 +73,6 @@ jobs:
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-
-      - name: Terraform Workspace
-        id: workspace
-        run: |
-          terraform workspace select ${{ env.ENV }} || terraform workspace new ${{ env.ENV }}
 
       - name: Terraform Plan
         id: plan

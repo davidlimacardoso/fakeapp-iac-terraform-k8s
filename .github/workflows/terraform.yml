@@ -37,13 +37,6 @@ jobs:
 
     steps:
 
-      - name: Debug Environment Variables
-        run: |
-          echo "AWS_ROLE is ${{ env.AWS_ROLE }}"
-          echo "AWS_REGION is ${{ env.AWS_REGION }}"
-          echo "ENV is ${{ env.ENV }}"
-          echo "BRANCH_NAME is ${{ env.BRANCH_NAME }}"
-
       - name: Checkout code
         uses: actions/checkout@v4
 

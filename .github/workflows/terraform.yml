@@ -9,8 +9,6 @@ on:
     paths:
       - terraform/**
       - k8s/**
-  issue_comment:
-    types: [created]
 
 env:
   ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' || 'unknown' }}
@@ -20,8 +18,8 @@ env:
   BUCKET_NAME : ${{ secrets.BUCKET_NAME }}
 
 permissions:
-  id-token: write   # This is required for requesting the JWT
-  contents: read    # This is required for actions/checkout
+  id-token: write
+  contents: read
 
 jobs:
   

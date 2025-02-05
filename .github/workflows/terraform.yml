@@ -88,7 +88,14 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
-            const planOutput = fs.readFileSync('./terraform/plan_output.txt', 'utf8');
+            let planOutput = fs.readFileSync('./terraform/plan_output.txt', 'utf8');
+
+            // Modificar o texto para se adequar ao formato diff
+            planOutput = planOutput
+              .replace(/^(\+)/gm, '+ ') // Garante que os + estejam no formato correto
+              .replace(/^(-)/gm, '- ') // Garante que os - estejam no formato correto
+              .replace(/^(~)/gm, '~ '); // Garante que os ~ estejam no formato correto
+
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization 🤖\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
@@ -96,7 +103,7 @@ jobs:
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
             <details><summary>Show Plan</summary>
   
-            \`\`\`\n
+            \`\`\`diff\n
             ${planOutput}
             \`\`\`
   

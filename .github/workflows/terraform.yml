@@ -65,7 +65,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -detailed-exitcode -input=false -out planfile -var-file=${{ env.ENV }}.tfvars -out=planfile
+        run: terraform plan -no-color -input=false -out planfile -var-file=${{ env.ENV }}.tfvars -out=planfile
         continue-on-error: true
 
       - name: Terraform plan status

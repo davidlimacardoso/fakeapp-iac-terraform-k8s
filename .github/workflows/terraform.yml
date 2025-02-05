@@ -9,17 +9,17 @@ on:
     paths:
       - terraform/**
       - k8s/**
-  issue_comment:
-    types: [created]
 
 env:
   ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' || 'unknown' }}
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+  AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/GitHubActionsAWSRole
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  BUCKET_NAME : ${{ secrets.BUCKET_NAME }}
 
 permissions:
   id-token: write
   contents: read
-  actions: read
 
 jobs:
   
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-      contents: read
+
     defaults:
       run:
         shell: bash
@@ -35,19 +35,21 @@ jobs:
 
     steps:
 
+      - name: Debug Environment Variables
+        run: |
+          echo "AWS_ROLE is ${{ env.AWS_ROLE }}"
+          echo "AWS_REGION is ${{ env.AWS_REGION }}"
+          echo "ENV is ${{ env.ENV }}"
+          echo "BRANCH_NAME is ${{ env.BRANCH_NAME }}"
+
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Showing Branch Name end Enviroment
-        run: | 
-          echo "The branch name is ${{ env.BRANCH_NAME }}!"
-          echo "The environment is ${{ env.ENV }}!"
 
       - name: Authenticate in the AWS
         uses: aws-actions/configure-aws-credentials@v4
         with: 
-          role-to-assume: "${{ secrets.AWS_ROLE }}"
-          aws-region: "${{ secrets.AWS_REGION }}"
+          role-to-assume: "${{ env.AWS_ROLE }}"
+          aws-region: "${{ env.AWS_REGION }}"
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -138,8 +140,8 @@ jobs:
       - name: Authenticate in the AWS
         uses: aws-actions/configure-aws-credentials@v4
         with: 
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ env.AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3

@@ -91,9 +91,9 @@ jobs:
             let planOutput = fs.readFileSync('./terraform/plan_output.txt', 'utf8');
 
             planOutput = planOutput
-              .replace(/^(\+)/gm, '+ ')
-              .replace(/^(\-)/gm, '- ')
-              .replace(/^(~)/gm, '~ ');
+              .replace(/^(\s*\+)/gm, '+')
+              .replace(/^(\s*\-)/gm, '+')
+              .replace(/^(\s*\~)/gm, '+');
 
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization 🤖\`${{ steps.init.outcome }}\`

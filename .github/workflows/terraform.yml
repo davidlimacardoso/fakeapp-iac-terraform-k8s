@@ -106,7 +106,7 @@ jobs:
 
             #### Terraform Workspace 🤖\`${{ steps.workspace.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            <details><summary>Show Plan 🔎</summary>
+            <details><summary>Show Plan</summary>
   
             \`\`\`diff
             ${planOutput}

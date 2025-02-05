@@ -1,208 +1,24 @@
-name: Terraform
-
+name: CI-CD
 on:
-  pull_request:
-    branches:
-      - main
-      - stage
-      - develop
-    paths:
-      - terraform/**
-      - k8s/**
-
-env:
-  ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' || 'unknown' }}
-  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-  AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.AWS_ROLE }}
-  AWS_REGION: ${{ secrets.AWS_REGION }}
-  BUCKET_NAME : ${{ secrets.BUCKET_NAME }}
-
-permissions:
-  id-token: write
-  contents: read
-
+  push:
+    branches: ["main"]
+  workflow_dispatch:
 
 jobs:
-  
-  plan:
+ 
+  CD:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
-      contents: read
-
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./terraform
-
-    steps:
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Debug Environment Variables
-        run: |
-          echo "AWS_ROLE is ${{ env.AWS_ROLE }}"
-          echo "AWS_REGION is ${{ env.AWS_REGION }}"
-          echo "ENV is ${{ env.ENV }}"
-          echo "BRANCH_NAME is ${{ env.BRANCH_NAME }}"
-
-      - name: Authenticate in the AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with: 
-          role-to-assume: "${{ env.AWS_ROLE }}"
-          aws-region: "${{ env.AWS_REGION }}"
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Refresh
-        run: rm -rf .terraform
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Workspace
-        id: workspace
-        run: |
-          terraform workspace select ${{ env.ENV }} || terraform workspace new ${{ env.ENV }}
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color -detailed-exitcode -input=false -out planfile -var-file=${{ env.ENV }}.tfvars -out=planfile
-        continue-on-error: true
-
-      - name: Terraform plan status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
-
-      - name: Hide Previous Comments
-        uses: kanga333/comment-hider@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Comment Plan Output
-        uses: actions/github-script@v6
-        if: always() && github.event_name == 'pull_request'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform Plan Output \`${{ steps.plan.outcome }}\`
-            \`\`\`\n
-            ${{ steps.plan.outputs.stdout }}
-            \`\`\`
-            
-            \:rocket\: To apply this plan, run this command\: \`\/apply\`
-
-            \n
-  
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
-
-
-  apply:
-    if: >
-      github.event_name == 'issue_comment' &&
-      github.event.issue.pull_request &&
-      github.event.comment.body == '/apply'
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      issues: write  
-      contents: write
       id-token: write
+      contents: read
+      actions: read
       
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./terraform
     steps:
+      - name: Obter o código do projeto
+        uses: actions/checkout@v4.2.2
 
-      - name: Notify Applying Settings
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = "\>\:rocket\: Applying the settings...";
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            });
-              
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Authenticate in the AWS
+      - name: Autenticar na AWS
         uses: aws-actions/configure-aws-credentials@v4
-        with: 
-          role-to-assume: ${{ env.AWS_ROLE }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Refresh
-        run: rm -rf .terraform
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Workspace
-        id: workspace
-        run: |
-          terraform workspace select ${{ env.ENV }} || terraform workspace new ${{ env.ENV }}
-
-      - name: Terraform Apply
-        id: apply
-        run: terraform apply -var-file=${{ env.ENV }}.tfvars -input=false -parallelism=1 planfile
-        continue-on-error: true
-
-      - name: Comment Apply Output
-        uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const command = context.payload.comment.body;
-            const outcome = "${{ steps.apply.outcome }}";
-            const emoji = outcome === 'failure' ? ':x:' : ':white_check_mark:';
-            const output = `#### Terraform Apply Output \`${outcome}\` ${emoji}
-            \`\`\`\n
-            ${{ steps.apply.outputs.stdout }} 
-            ${{ steps.apply.outputs.stderr }}
-            \`\`\`
-            *Executed by: @${{ github.actor }}, Terraform command: \`${command}\`*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
-
-      - name: Merge Pull Request
-        if: steps.apply.outcome == 'success'
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            await github.rest.pulls.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              merge_method: 'merge'
-            });
-
-      - name: Hide Previous Comments
-        if: steps.apply.outcome == 'success'
-        uses: kanga333/comment-hider@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1

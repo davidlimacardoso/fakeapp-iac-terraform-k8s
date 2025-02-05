@@ -107,7 +107,7 @@ jobs:
             // Merge modified lines into a single string
             planOutput = modifiedLines.join('\n');
 
-            #### Terraform Workspace \`${{ env.ENV }}\`  🤖\`${{ steps.workspace.outcome }}\`
+            #### Terraform Workspace \`${process.env.ENV}\` is 🤖\`${{ steps.workspace.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
             <details><summary>Show Plan</summary>
   

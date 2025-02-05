@@ -83,22 +83,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform Plan Output \`${{ steps.plan.outcome }}\`
+            const planOutcome = '${{ steps.plan.outcome }}';
+            const planStdout = '${{ steps.plan.outputs.stdout }}';
+            const output = `#### Terraform Plan Output \`${planOutcome}\`
+            \`\`\`\n
+            ${planStdout}
             \`\`\`
-            ${{ steps.plan.outputs.stdout }}
-            \`\`\`
-            
-            \:rocket\: To apply this plan, run this command\: \`\/apply\`
-
-            \n
-  
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
 
 
   apply:

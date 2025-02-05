@@ -51,9 +51,6 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
-      #- name: Terraform Refresh
-      #  run: rm -rf .terraform
-
       - name: Terraform Init
         id: init
         run: terraform init
@@ -92,10 +89,10 @@ jobs:
 
             const lines = planOutput.split('\n');
             const modifiedLines = lines.map(line => {
-                // Analize if line start with this signals: '+', '-' ou '~'
+                // Analize if line start with this signals: '+', '-' or '~'
                 const trimmedLine = line.trim();
                 if (trimmedLine.startsWith('+') || trimmedLine.startsWith('-') || trimmedLine.startsWith('~')) {
-                    // Capture the sihnal
+                    // Capture the sign
                     const sign = trimmedLine[0];
                     // Remove the sign and the first space, then add the corresponding sign at the beginning
                     let newLine = line.replace(/^[+\-~]\s*/, ' ').replace(/^ /, sign === '~' ? '! ' : sign + ' ');
@@ -107,9 +104,10 @@ jobs:
             // Merge modified lines into a single string
             planOutput = modifiedLines.join('\n');
 
-            #### Terraform Workspace \`${process.env.ENV}\` is 🤖\`${{ steps.workspace.outcome }}\`
+            const output = #### Terraform Workspace 🤖\`${{ steps.workspace.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            <details><summary>Show Plan</summary>
+            #### Terraform Environment 👨‍💻\`${process.env.ENV}\`
+            <details><summary>Show Plan 🔎</summary>
   
             \`\`\`diff
             ${planOutput}
@@ -117,7 +115,7 @@ jobs:
   
             </details>
             
-            \:rocket\: To apply this plan, run this command\: \`\/apply\`
+            \:rocket\: **To apply this plan, run this command\:** \`\/apply\`
 
             \n
   

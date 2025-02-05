@@ -84,7 +84,7 @@ jobs:
       - name: Post PR comment
         uses: borchero/terraform-plan-comment@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           planfile: .planfile
 
       - name: Terraform plan status

@@ -15,10 +15,6 @@ env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
   AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.AWS_ROLE }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
-  TF_CLOUD_ORGANIZATION: "david_devops"
-  TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
-  TF_WORKSPACE: "terraform-github-actions"
-  CONFIG_DIRECTORY: "./"
 
 jobs:
   

@@ -1,5 +1,5 @@
 resource "aws_acm_certificate" "cert" {
-  domain_name       = local.env != "prd" ? "*.${local.env}.${var.domain_name}" : "*.${var.domain_name}"
+  domain_name       = local.env != "prod" ? "*.${local.env}.${var.domain_name}" : "*.${var.domain_name}"
   validation_method = "DNS"
 }
 

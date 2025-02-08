@@ -79,8 +79,8 @@ jobs:
       - name: Upload Terraform Plan
         uses: actions/upload-artifact@v4
         with:
-          name: env-test-${{ github.event.pull_request.number }}.tfplan
-          path: "terraform/file-${{ env.ENV }}-${{ github.event.pull_request.number }}.tfplan"
+          name: file-${{ github.event.pull_request.number }}.tfplan
+          path: "terraform/file-${{ github.event.pull_request.number }}.tfplan"
           # throw an error if we can't find the Plan's file
           if-no-files-found: error
           # replace if an existing one is found

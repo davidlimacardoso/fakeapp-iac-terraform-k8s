@@ -16,3 +16,8 @@ terraform apply -var-file=stg.tfvars \
 ```
 
 After create the roles, you need to add into the GitHub Settings `Secrets and Variables`.
+
+# References
+
+[Como utilizar IAM Roles para conectar o GitHub Actions na AWS](https://aws.amazon.com/pt/blogs/aws-brasil/como-utilizar-iam-roles-para-conectar-o-github-actions-na-aws/)
+

@@ -12,9 +12,6 @@ on:
   issue_comment:
     types: [created]
 
-env:
-  ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' }}
-  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
   AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.AWS_ROLE }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
 
@@ -26,6 +23,10 @@ jobs:
       pull-requests: write
       id-token: write
       contents: read
+
+    env:
+      ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' }}
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
     defaults:
       run:
@@ -141,6 +142,10 @@ jobs:
       issues: write  
       contents: write
       id-token: write
+
+    env:
+      ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' }}
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       
     defaults:
       run:

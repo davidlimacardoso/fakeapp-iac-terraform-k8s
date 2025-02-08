@@ -1,4 +1,4 @@
-name: Terraform Apply
+name: Terraform Plan
 
 on:
   pull_request:
@@ -6,8 +6,6 @@ on:
       - main
     paths:
       - terraform/**
-  issue_comment:
-    types: [created]
 
 jobs:
   

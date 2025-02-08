@@ -1,5 +1,6 @@
 locals {
-  env = terraform.workspace
+  env       = terraform.workspace
+  timestamp = timestamp()
 }
 
 variable "region" {

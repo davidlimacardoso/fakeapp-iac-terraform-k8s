@@ -148,8 +148,8 @@ jobs:
       id-token: write
 
     env:
-      ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' }}
-      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+      ENV: ${{ github.event.issue.pull_request.base.ref == 'main' && 'prod' || github.event.issue.pull_request.base.ref == 'stage' && 'stg' || github.event.issue.pull_request.base.ref == 'develop' && 'dev' }}
+      BRANCH_NAME: ${{ github.event.issue.pull_request.head.ref }}
       
     defaults:
       run:

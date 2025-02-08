@@ -9,6 +9,8 @@ on:
     paths:
       - terraform/**
       - k8s/**
+  issue_comment:
+    types: [created]
 
 env:
   ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' || 'unknown' }}

@@ -171,6 +171,10 @@ jobs:
       #     echo "GitHub Context:"
       #     echo "${{ toJson(github) }}"
 
+      - name: Show Outputs Plan
+        run: | 
+          echo ${{ toJson(needs.plan.outputs) }}
+
       - name: Notify Applying Settings
         uses: actions/github-script@v6
         with:

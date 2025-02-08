@@ -32,6 +32,10 @@ jobs:
       ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' }}
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
+    outputs:
+      ENV: ${{ env.ENV }}
+      BRANCH_NAME: ${{ env.BRANCH_NAME }}
+
     defaults:
       run:
         shell: bash
@@ -148,8 +152,8 @@ jobs:
       id-token: write
 
     env:
-      ENV: ${{ github.event.issue.pull_request.base.ref == 'main' && 'prod' || github.event.issue.pull_request.base.ref == 'stage' && 'stg' || github.event.issue.pull_request.base.ref == 'develop' && 'dev' }}
-      BRANCH_NAME: ${{ github.event.issue.pull_request.head.ref }}
+      ENV: ${{ needs.plan.outputs.ENV }}
+      BRANCH_NAME: ${{ needs.plan.outputs.BRANCH_NAME }}
       
     defaults:
       run:
@@ -158,10 +162,10 @@ jobs:
         
     steps:
 
-      - name: Print GitHub Context
-        run: |
-          echo "GitHub Context:"
-          echo "${{ toJson(github) }}"
+      # - name: Print GitHub Context
+      #   run: |
+      #     echo "GitHub Context:"
+      #     echo "${{ toJson(github) }}"
 
       - name: Notify Applying Settings
         uses: actions/github-script@v6

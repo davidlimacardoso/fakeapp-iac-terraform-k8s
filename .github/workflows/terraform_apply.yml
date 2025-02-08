@@ -14,10 +14,11 @@ env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
   AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.AWS_ROLE }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
+
 jobs:
   apply:
     if: >
-      github.event_name == 'issue_comment'
+      github.event_name == 'issue_comment' &&
       github.event.comment.body == '/apply'
     runs-on: ubuntu-latest
     permissions:

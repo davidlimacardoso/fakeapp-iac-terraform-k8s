@@ -1,0 +1,16 @@
+name: Protect Main Branch
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  protect-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR is from stage branch
+        run: |
+          if [[ ${{ github.event.pull_request.head.ref }} != 'stage' ]]; then
+            echo "Pull request must come from the 'stage' branch."
+            exit 1
+          fi

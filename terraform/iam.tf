@@ -31,7 +31,8 @@ resource "aws_iam_role" "github_actions_iac_role" {
             "token.actions.githubusercontent.com:sub" = [
               "repo:davidlimacardoso/fakeapp-iac-terraform-k8s:ref:refs/heads/main",
               "repo:davidlimacardoso/fakeapp-iac-terraform-k8s:ref:refs/heads/stage",
-              "repo:davidlimacardoso/fakeapp-iac-terraform-k8s:ref:refs/heads/developer"
+              "repo:davidlimacardoso/fakeapp-iac-terraform-k8s:ref:refs/heads/developer",
+              "repo:davidlimacardoso/fakeapp-iac-terraform-k8s:pull_request"
             ]
           }
         }

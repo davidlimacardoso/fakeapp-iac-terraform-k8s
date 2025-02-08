@@ -137,7 +137,10 @@ jobs:
     if: >
       github.event_name == 'issue_comment' &&
       github.event.issue.pull_request &&
-      github.event.comment.body == '/apply'
+      github.event.comment.body == '/apply' &&
+      github.base_ref == 'stage' ||
+      github.base_ref == 'develop' ||
+      github.base_ref == 'main'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

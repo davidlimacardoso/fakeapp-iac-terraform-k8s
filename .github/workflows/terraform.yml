@@ -122,6 +122,13 @@ jobs:
               body: output
             })
 
+  debug:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      id-token: write
+      contents: read
+
   apply:
     if: >
       github.event_name == 'issue_comment' &&

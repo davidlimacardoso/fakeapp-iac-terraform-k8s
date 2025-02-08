@@ -33,8 +33,8 @@ jobs:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
     outputs:
-      ENV: ${{ env.ENV }}
-      BRANCH_NAME: ${{ env.BRANCH_NAME }}
+      ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' }}
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
     defaults:
       run:

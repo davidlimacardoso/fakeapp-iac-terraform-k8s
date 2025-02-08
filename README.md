@@ -1,6 +1,9 @@
 # demo-iac-terraform-k8s
 Infraestructure Terraform and K8s to provision and management resources 
 
+## More About The Infraestructure
+The eks cluster and other Terraform resources here, are for demonstration purposes, the infraestructure provisioned hosted the application EKS. 
+
 
 ## Initials Settings
 

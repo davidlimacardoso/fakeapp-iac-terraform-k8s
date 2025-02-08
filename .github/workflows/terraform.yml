@@ -15,6 +15,8 @@ on:
 env:
   AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.AWS_ROLE }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
+  TEST_ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' }}
+  TEST_BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
   
@@ -52,90 +54,90 @@ jobs:
           role-to-assume: "${{ env.AWS_ROLE }}"
           aws-region: "${{ env.AWS_REGION }}"
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
+      # - name: Set up Terraform
+      #   uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
-        id: init
-        run: terraform init
+      # - name: Terraform Init
+      #   id: init
+      #   run: terraform init
 
-      - name: Terraform Fmt
-        id: fmt
-        run: terraform fmt -check
+      # - name: Terraform Fmt
+      #   id: fmt
+      #   run: terraform fmt -check
    
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
+      # - name: Terraform Validate
+      #   id: validate
+      #   run: terraform validate -no-color
 
-      - name: Terraform Workspace
-        id: workspace
-        run: |
-          terraform workspace select ${{ env.ENV }} || terraform workspace new ${{ env.ENV }}
+      # - name: Terraform Workspace
+      #   id: workspace
+      #   run: |
+      #     terraform workspace select ${{ env.ENV }} || terraform workspace new ${{ env.ENV }}
 
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color -input=false -var-file=${{ env.ENV }}.tfvars -out=planfile > plan_output.txt
-        continue-on-error: true
+      # - name: Terraform Plan
+      #   id: plan
+      #   run: terraform plan -no-color -input=false -var-file=${{ env.ENV }}.tfvars -out=planfile > plan_output.txt
+      #   continue-on-error: true
  
-      - name: Upload Plan File
-        uses: actions/upload-artifact@v4
-        with:
-          name: terraform-plan
-          path: ./terraform/planfile
+      # - name: Upload Plan File
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: terraform-plan
+      #     path: ./terraform/planfile
 
-      - name: Hide Previous Comments
-        uses: kanga333/comment-hider@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Hide Previous Comments
+      #   uses: kanga333/comment-hider@master
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Comment Plan Output
-        uses: actions/github-script@v6
-        if: always() && github.event_name == 'pull_request'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            let planOutput = fs.readFileSync('./terraform/plan_output.txt', 'utf8');
+      # - name: Comment Plan Output
+      #   uses: actions/github-script@v6
+      #   if: always() && github.event_name == 'pull_request'
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       const fs = require('fs');
+      #       let planOutput = fs.readFileSync('./terraform/plan_output.txt', 'utf8');
 
-            const lines = planOutput.split('\n');
-            const modifiedLines = lines.map(line => {
-                // Analize if line start with this signals: '+', '-' ou '~'
-                const trimmedLine = line.trim();
-                if (trimmedLine.startsWith('+') || trimmedLine.startsWith('-') || trimmedLine.startsWith('~')) {
-                    // Capture the sihnal
-                    const sign = trimmedLine[0];
-                    // Remove the sign and the first space, then add the corresponding sign at the beginning
-                    let newLine = line.replace(/^[+\-~]\s*/, ' ').replace(/^ /, sign === '~' ? '! ' : sign + ' ');
-                    return newLine;
-                }
-                return line;
-            });
+      #       const lines = planOutput.split('\n');
+      #       const modifiedLines = lines.map(line => {
+      #           // Analize if line start with this signals: '+', '-' ou '~'
+      #           const trimmedLine = line.trim();
+      #           if (trimmedLine.startsWith('+') || trimmedLine.startsWith('-') || trimmedLine.startsWith('~')) {
+      #               // Capture the sihnal
+      #               const sign = trimmedLine[0];
+      #               // Remove the sign and the first space, then add the corresponding sign at the beginning
+      #               let newLine = line.replace(/^[+\-~]\s*/, ' ').replace(/^ /, sign === '~' ? '! ' : sign + ' ');
+      #               return newLine;
+      #           }
+      #           return line;
+      #       });
 
-            // Merge modified lines into a single string
-            planOutput = modifiedLines.join('\n');
+      #       // Merge modified lines into a single string
+      #       planOutput = modifiedLines.join('\n');
 
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Workspace 🤖\`${{ steps.workspace.outcome }}\`
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            <details><summary>Show Plan</summary>
+      #       const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+      #       #### Terraform Workspace 🤖\`${{ steps.workspace.outcome }}\`
+      #       #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+      #       <details><summary>Show Plan</summary>
   
-            \`\`\`diff
-            ${planOutput}
-            \`\`\`
+      #       \`\`\`diff
+      #       ${planOutput}
+      #       \`\`\`
   
-            </details>
+      #       </details>
             
-            \:rocket\: To apply this plan, run this command\: \`\/apply\`
+      #       \:rocket\: To apply this plan, run this command\: \`\/apply\`
 
-            \n
+      #       \n
   
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+      #       *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+      #       github.rest.issues.createComment({
+      #         issue_number: context.issue.number,
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         body: output
+      #       })
 
   apply:
   
@@ -152,8 +154,10 @@ jobs:
       id-token: write
 
     env:
-      ENV: ${{ needs.plan.outputs.ENV }}
-      BRANCH_NAME: ${{ needs.plan.outputs.BRANCH_NAME }}
+      ENV: ${{ github.event.issue.pull_request.base.ref == 'main' && 'prod' || github.event.issue.pull_request.base.ref == 'stage' && 'stg' || github.event.issue.pull_request.base.ref == 'develop' && 'dev' }}
+      BRANCH_NAME: ${{ github.event.issue.pull_request.head.ref }}
+      PLAN_ENV: ${{ needs.plan.outputs.ENV }}
+      PLAN_BRANCH_NAME: ${{ needs.plan.outputs.BRANCH_NAME }}
       
     defaults:
       run:

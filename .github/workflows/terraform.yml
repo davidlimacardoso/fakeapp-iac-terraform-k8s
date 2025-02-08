@@ -12,6 +12,7 @@ on:
   issue_comment:
     types: [created]
 
+env:
   AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.AWS_ROLE }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
 

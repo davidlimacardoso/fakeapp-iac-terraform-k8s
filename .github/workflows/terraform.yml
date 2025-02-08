@@ -67,6 +67,12 @@ jobs:
         id: plan
         run: terraform plan -no-color -input=false -var-file=${{ env.ENV }}.tfvars -out=planfile > plan_output.txt
         continue-on-error: true
+ 
+      - name: Upload Plan File
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan
+          path: ./terraform/planfile
 
       - name: Hide Previous Comments
         uses: kanga333/comment-hider@master
@@ -158,6 +164,12 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Download Plan File
+        uses: actions/download-artifact@v3
+        with:
+          name: terraform-plan
+          path: ./terraform/
 
       - name: Authenticate in the AWS
         uses: aws-actions/configure-aws-credentials@v4

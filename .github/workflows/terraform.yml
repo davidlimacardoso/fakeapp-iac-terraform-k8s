@@ -65,7 +65,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -input=false -var-file=$(terraform workspace show).tfvars -out=planfile > plan_output.txt
+        run: terraform plan -no-color -input=false -var-file=${{ env.ENV }}.tfvars -out=planfile > plan_output.txt
         continue-on-error: true
 
       - name: Hide Previous Comments
@@ -164,20 +164,7 @@ jobs:
         with: 
           role-to-assume: "${{ env.AWS_ROLE }}"
           aws-region: "${{ env.AWS_REGION }}"
-          
-      - name: Notify Applying Settings
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = "\>\:rocket\: Applying the settings...";
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            });
-              
+                        
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -193,7 +180,7 @@ jobs:
 
       - name: Terraform Apply
         id: apply
-        run: terraform apply -auto-approve -no-color -input=false -var-file=$(terraform workspace show).tfvars -parallelism=1 planfile
+        run: terraform apply -auto-approve -no-color -input=false -var-file=${{ env.ENV }}.tfvars -parallelism=1 ./terraform/planfile
         continue-on-error: true
 
       - name: Comment Apply Output

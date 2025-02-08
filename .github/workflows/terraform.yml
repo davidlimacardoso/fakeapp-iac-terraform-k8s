@@ -140,7 +140,7 @@ jobs:
       #       })
 
   apply:
-  
+    needs: plan
     if: >
       github.event_name == 'issue_comment' &&
       github.event.issue.pull_request &&
@@ -154,8 +154,10 @@ jobs:
       id-token: write
 
     env:
-      ENV: ${{ github.event.issue.pull_request.base.ref == 'main' && 'prod' || github.event.issue.pull_request.base.ref == 'stage' && 'stg' || github.event.issue.pull_request.base.ref == 'develop' && 'dev' }}
-      BRANCH_NAME: ${{ github.event.issue.pull_request.head.ref }}
+      TEST_ENV: ${{ github.event.issue.pull_request.base.ref == 'main' && 'prod' || github.event.issue.pull_request.base.ref == 'stage' && 'stg' || github.event.issue.pull_request.base.ref == 'develop' && 'dev' }}
+      TESTE_BRANCH_NAME: ${{ github.event.issue.pull_request.head.ref }}
+      ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' }}
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       PLAN_ENV: ${{ needs.plan.outputs.ENV }}
       PLAN_BRANCH_NAME: ${{ needs.plan.outputs.BRANCH_NAME }}
       

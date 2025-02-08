@@ -12,7 +12,25 @@ on:
   issue_comment:
     types: [created]
 
+env:
+  ENV: ${{ github.base_ref == 'main' && 'prod' || github.base_ref == 'stage' && 'stg' || github.base_ref == 'develop' && 'dev' || 'unknown' }}
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+  AWS_ROLE: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/${{ secrets.AWS_ROLE }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+
 jobs:
+
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug
+        run: |
+          echo "ENV: $ENV"
+          echo "BRANCH_NAME is ${{ env.BRANCH_NAME }}"
+          echo "GITHUB_EVENT_NAME is ${{ github.event_name }}"
+          echo "GITHUB_EVENT_COMMENT_BODY is ${{ github.event.comment.body }}"
+          echo "GITHUB_BASE_REF is ${{ github.base_ref }}"
 
   apply:
     if: >

@@ -158,6 +158,11 @@ jobs:
         
     steps:
 
+      - name: Print GitHub Context
+        run: |
+          echo "GitHub Context:"
+          echo "${{ toJson(github) }}"
+
       - name: Notify Applying Settings
         uses: actions/github-script@v6
         with:
